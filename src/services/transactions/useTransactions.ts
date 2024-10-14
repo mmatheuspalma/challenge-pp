@@ -1,4 +1,4 @@
-import { ChangeEvent, ChangeEventHandler, useMemo, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, useCallback, useMemo, useState } from "react";
 
 import { ITransaction } from "@/app/api/transactions/route";
 
@@ -25,9 +25,15 @@ const useTransactions = () => {
   const [transactionSort, setTransactionSort] = useState<TransactionSort>();
   const [transactionDateStart, setTransactionDateStart] = useState<Date>(new Date());
   const [transactionDateEnd, setTransactionDateEnd] = useState<Date>();
+  const [transactionPage, setTransactionPage] = useState<number>(1);
+  const [transactionPageSize, setTransactionPageSize] = useState<number>(5);
+
+  const splitIntoPages = <T>(items: T[], page: number, pageSize: number): T[] => {
+    return items.slice((page - 1) * pageSize, page * pageSize);
+  }
 
   // memo manipulating
-  const transactionsFiltered = useMemo(() => {
+  const transactionsFiltered: ITransaction[] = useMemo(() => {
     let itemsFiltered = transactions;
 
     if (transactionSort) {
@@ -40,18 +46,18 @@ const useTransactions = () => {
       })
     }
 
-    if (!transactionDateStart || !transactionDateEnd) {
-      return itemsFiltered;
+    if (transactionDateStart && transactionDateEnd) {
+      itemsFiltered = transactions.filter(item => {
+        return item.date >= new Date(transactionDateStart) && item.date <= new Date(transactionDateEnd);
+      });
     }
 
-    itemsFiltered = transactions.filter(item => {
-      return item.date >= new Date(transactionDateStart) && item.date <= new Date(transactionDateEnd);
-    });
-
-    return itemsFiltered;
-  }, [transactionSort, transactionDateStart, transactionDateEnd, transactions]);
+    return splitIntoPages<ITransaction>(itemsFiltered, transactionPage, transactionPageSize);
+  }, [transactionPage, transactionPageSize, transactionSort, transactionDateStart, transactionDateEnd, transactions]);
 
   const transactionSortKey = useMemo(() => `${transactionSort?.field}-${transactionSort?.direction}`, [transactionSort]);
+
+  const transactionTotalPages = useMemo(() => Math.ceil(transactions.length / transactionPageSize) + 1, [transactions, transactionPageSize]);
 
   const getTransactionsList = async (): Promise<ITransaction[]> => {
     return await (await fetch('/api/transactions')).json();
@@ -101,6 +107,44 @@ const useTransactions = () => {
     });
   };
 
+  const handleTransactionPageSize = (event: ChangeEvent<HTMLSelectElement>) => {
+    const pageSize = Number(event.target.value);
+
+    setTransactionPage(1);
+    setTransactionPageSize(pageSize);
+  };
+
+  const goToPreviousTransactionPage = () => {
+    if (!canGoToPreviousTransactionPage) return;
+
+    setTransactionPage((previousTransactionPage => previousTransactionPage - 1));
+  };
+
+  const goToNextTransactionPage = () => {
+    if (!canGoToNextTransactionPage) return;
+
+    setTransactionPage((previousTransactionPage => previousTransactionPage + 1));
+  };
+
+  const goToTransactionPage = (page: number) => {
+    if (!canGoToTransactionPage) return;
+
+    setTransactionPage(page);
+  };
+
+  const canGoToTransactionPage = useCallback((page: number) => {
+    return Boolean(splitIntoPages(transactions, page, transactionPageSize).length);
+  }, [transactions, transactionPage, transactionPageSize]);
+
+  const canGoToPreviousTransactionPage = useMemo(() => {
+    return canGoToTransactionPage(transactionPage - 1);
+  }, [transactions, transactionPage, transactionPageSize]);
+
+
+  const canGoToNextTransactionPage = useMemo(() => {
+    return canGoToTransactionPage(transactionPage + 1);
+  }, [transactions, transactionPage, transactionPageSize]);
+
   return {
     loading,
     setLoading,
@@ -108,6 +152,17 @@ const useTransactions = () => {
     setTransactionError,
     transactionErrorOpened,
     setTransactionErrorOpened,
+    transactionPage,
+    transactionTotalPages,
+    goToTransactionPage,
+    goToPreviousTransactionPage,
+    goToNextTransactionPage,
+    canGoToTransactionPage,
+    canGoToPreviousTransactionPage,
+    canGoToNextTransactionPage,
+    transactionPageSize,
+    handleTransactionPageSize,
+    setTransactionPageSize,
     transactionSort,
     handleTransactionSort,
     transactionSortKey,

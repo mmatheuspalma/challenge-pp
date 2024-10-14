@@ -5,17 +5,28 @@ import { useEffect, useState } from "react";
 import useTransactions from "@/services/transactions/useTransactions";
 
 import Modal from "@/components/Modal";
+import Filter from "@/components/Filter";
 import Transaction from "@/components/Transaction";
-import Datepicker from "@/components/DatePicker";
+import Pagination from "@/components/Pagination";
 
 export default function Home() {
   const {
     loading,
     setLoading,
     transactions,
+    transactionTotalPages,
     transactionError,
     transactionErrorOpened,
     setTransactionErrorOpened,
+    transactionPage,
+    transactionPageSize,
+    handleTransactionPageSize,
+    goToTransactionPage,
+    goToPreviousTransactionPage,
+    goToNextTransactionPage,
+    canGoToTransactionPage,
+    canGoToPreviousTransactionPage,
+    canGoToNextTransactionPage,
     handleTransactionSort,
     transactionSortKey,
     getAllTransactions,
@@ -34,27 +45,18 @@ export default function Home() {
   return (
     <div className="p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="w-[100%]">
-        <div className="w-[100%] mb-4 flex flex-row space-between">
-          <button
-            className={`${forcedApiError ? 'bg-[red]' : 'bg-[blue]'} text-white py-2 px-4 rounded`}
-            onClick={() => setForcedApiError(!forcedApiError)}
-          >
-            Force API Error
-          </button>
-          <select value={transactionSortKey} onChange={handleTransactionSort}>
-            <option value="date-asc">Date newest</option>
-            <option value="date-desc">Date oldest</option>
-            <option value="amount-asc">Amount greater</option>
-            <option value="amount-desc">Amount lower</option>
-          </select>
-          <Datepicker
-            startDate={transactionDateStart}
-            endDate={transactionDateEnd}
-            onChangeStartDate={setTransactionDateStart}
-            onChangeEndDate={setTransactionDateEnd}
-            multiple
-          />
-        </div>
+        <Filter
+          forcedApiError={forcedApiError}
+          setForcedApiError={setForcedApiError}
+          transactionSortKey={transactionSortKey}
+          handleTransactionSort={handleTransactionSort}
+          transactionDateStart={transactionDateStart}
+          setTransactionDateStart={setTransactionDateStart}
+          transactionDateEnd={transactionDateEnd}
+          setTransactionDateEnd={setTransactionDateEnd}
+          transactionPageSize={transactionPageSize}
+          handleTransactionPageSize={handleTransactionPageSize}
+        />
         <div className="flex flex-col gap-4">
           {
             transactions.length ?
@@ -73,6 +75,16 @@ export default function Home() {
               </div>
             )
           }
+          <Pagination
+            transactionPage={transactionPage}
+            transactionTotalPages={transactionTotalPages}
+            goToTransactionPage={goToTransactionPage}
+            canGoToTransactionPage={canGoToTransactionPage}
+            goToPreviousTransactionPage={goToPreviousTransactionPage}
+            canGoToPreviousTransactionPage={canGoToPreviousTransactionPage}
+            goToNextTransactionPage={goToNextTransactionPage}
+            canGoToNextTransactionPage={canGoToNextTransactionPage}
+          />
         </div>
         {
           transactionError && (

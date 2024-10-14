@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, useMemo, useState } from "react";
 
 import { ITransaction } from "@/app/api/transactions/route";
 
@@ -7,9 +7,14 @@ type TransactionError = {
   message: string;
 };
 
-type TransactionFilter = {
-  field: string;
-  value: string;
+enum TransactionSortDirection {
+  asc = 'asc',
+  desc = 'desc',
+};
+
+type TransactionSort = {
+  field: keyof ITransaction;
+  direction: TransactionSortDirection;
 };
 
 const useTransactions = () => {
@@ -17,20 +22,36 @@ const useTransactions = () => {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [transactionError, setTransactionError] = useState<TransactionError>();
   const [transactionErrorOpened, setTransactionErrorOpened] = useState<boolean>(false);
-  const [transactionFilters, setTransactionFilters] = useState<TransactionFilter>();
+  const [transactionSort, setTransactionSort] = useState<TransactionSort>();
   const [transactionDateStart, setTransactionDateStart] = useState<Date>(new Date());
   const [transactionDateEnd, setTransactionDateEnd] = useState<Date>();
 
   // memo manipulating
   const transactionsFiltered = useMemo(() => {
-    if (!transactionDateStart || !transactionDateEnd) {
-      return transactions;
+    let itemsFiltered = transactions;
+
+    if (transactionSort) {
+      itemsFiltered = itemsFiltered.sort((itemA, itemB) => {
+        if (transactionSort.direction === TransactionSortDirection.asc) {
+          return itemA[transactionSort.field] > itemB[transactionSort.field] ? -1 : 0;
+        }
+          
+        return itemA[transactionSort.field] > itemB[transactionSort.field] ? 0 : -1;
+      })
     }
 
-    return transactions.filter((t: ITransaction) => {
-      return t.date >= new Date(transactionDateStart) && t.date <= new Date(transactionDateEnd);
-    })
-  }, [transactionDateStart, transactionDateEnd, transactions]);
+    if (!transactionDateStart || !transactionDateEnd) {
+      return itemsFiltered;
+    }
+
+    itemsFiltered = transactions.filter(item => {
+      return item.date >= new Date(transactionDateStart) && item.date <= new Date(transactionDateEnd);
+    });
+
+    return itemsFiltered;
+  }, [transactionSort, transactionDateStart, transactionDateEnd, transactions]);
+
+  const transactionSortKey = useMemo(() => `${transactionSort?.field}-${transactionSort?.direction}`, [transactionSort]);
 
   const getTransactionsList = async (): Promise<ITransaction[]> => {
     return await (await fetch('/api/transactions')).json();
@@ -71,6 +92,15 @@ const useTransactions = () => {
     }
   };
 
+  const handleTransactionSort = (event: ChangeEvent<HTMLSelectElement>) => {
+    const [field, direction] = event.target.value.split('-');
+
+    setTransactionSort({
+      field: field as keyof ITransaction,
+      direction: direction as TransactionSortDirection
+    });
+  };
+
   return {
     loading,
     setLoading,
@@ -78,8 +108,9 @@ const useTransactions = () => {
     setTransactionError,
     transactionErrorOpened,
     setTransactionErrorOpened,
-    transactionFilters,
-    setTransactionFilters,
+    transactionSort,
+    handleTransactionSort,
+    transactionSortKey,
     transactionDateStart,
     setTransactionDateStart,
     transactionDateEnd,

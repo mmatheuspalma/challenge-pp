@@ -16,6 +16,8 @@ export default function Home() {
     transactionError,
     transactionErrorOpened,
     setTransactionErrorOpened,
+    handleTransactionSort,
+    transactionSortKey,
     getAllTransactions,
     transactionDateStart,
     setTransactionDateStart,
@@ -39,8 +41,12 @@ export default function Home() {
           >
             Force API Error
           </button>
-          {transactionDateStart?.toDateString()}
-          {transactionDateEnd?.toDateString()}
+          <select value={transactionSortKey} onChange={handleTransactionSort}>
+            <option value="date-asc">Date newest</option>
+            <option value="date-desc">Date oldest</option>
+            <option value="amount-asc">Amount greater</option>
+            <option value="amount-desc">Amount lower</option>
+          </select>
           <Datepicker
             startDate={transactionDateStart}
             endDate={transactionDateEnd}

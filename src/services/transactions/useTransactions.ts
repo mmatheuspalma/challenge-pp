@@ -1,4 +1,4 @@
-import { ChangeEvent, ChangeEventHandler, useCallback, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useMemo, useState } from "react";
 
 import { ITransaction } from "@/app/api/transactions/route";
 
@@ -18,7 +18,7 @@ type TransactionSort = {
 };
 
 const useTransactions = () => {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [transactionError, setTransactionError] = useState<TransactionError>();
   const [transactionErrorOpened, setTransactionErrorOpened] = useState<boolean>(false);
@@ -32,7 +32,6 @@ const useTransactions = () => {
     return items.slice((page - 1) * pageSize, page * pageSize);
   }
 
-  // memo manipulating
   const transactionsFiltered: ITransaction[] = useMemo(() => {
     let itemsFiltered = transactions;
 
@@ -48,16 +47,20 @@ const useTransactions = () => {
 
     if (transactionDateStart && transactionDateEnd) {
       itemsFiltered = transactions.filter(item => {
-        return item.date >= new Date(transactionDateStart) && item.date <= new Date(transactionDateEnd);
+        return new Date(item.date) >= new Date(transactionDateStart) && new Date(item.date) <= new Date(transactionDateEnd);
       });
     }
 
-    return splitIntoPages<ITransaction>(itemsFiltered, transactionPage, transactionPageSize);
+    return itemsFiltered;
   }, [transactionPage, transactionPageSize, transactionSort, transactionDateStart, transactionDateEnd, transactions]);
 
-  const transactionSortKey = useMemo(() => `${transactionSort?.field}-${transactionSort?.direction}`, [transactionSort]);
+  const transactionsPaginated: ITransaction[] = useMemo(() => {
+    return splitIntoPages<ITransaction>(transactionsFiltered, transactionPage, transactionPageSize)
+  }, [transactionsFiltered, transactionPage, transactionPageSize, transactionSort])
 
-  const transactionTotalPages = useMemo(() => Math.ceil(transactions.length / transactionPageSize) + 1, [transactions, transactionPageSize]);
+  const transactionAmount = useMemo(() => transactionsFiltered.reduce((pV, cV) => pV + cV.amount, 0), [transactionsFiltered]);
+  const transactionSortKey = useMemo(() => `${transactionSort?.field}-${transactionSort?.direction}`, [transactionSort]);
+  const transactionTotalPages = useMemo(() => Math.ceil(transactionsFiltered.length / transactionPageSize), [transactionsFiltered, transactionPageSize]);
 
   const getTransactionsList = async (): Promise<ITransaction[]> => {
     return await (await fetch('/api/transactions')).json();
@@ -114,6 +117,16 @@ const useTransactions = () => {
     setTransactionPageSize(pageSize);
   };
 
+  const handleTransactionDateStart = (date: Date) => {
+    setTransactionPage(1);
+    setTransactionDateStart(date);
+  }
+
+  const handleTransactionDateEnd = (date: Date) => {
+    setTransactionPage(1);
+    setTransactionDateEnd(date);
+  }
+
   const goToPreviousTransactionPage = () => {
     if (!canGoToPreviousTransactionPage) return;
 
@@ -133,17 +146,17 @@ const useTransactions = () => {
   };
 
   const canGoToTransactionPage = useCallback((page: number) => {
-    return Boolean(splitIntoPages(transactions, page, transactionPageSize).length);
-  }, [transactions, transactionPage, transactionPageSize]);
+    return Boolean(splitIntoPages(transactionsFiltered, page, transactionPageSize).length);
+  }, [transactionsFiltered, transactionPageSize]);
 
   const canGoToPreviousTransactionPage = useMemo(() => {
     return canGoToTransactionPage(transactionPage - 1);
-  }, [transactions, transactionPage, transactionPageSize]);
+  }, [transactionPage, transactionPageSize]);
 
 
   const canGoToNextTransactionPage = useMemo(() => {
     return canGoToTransactionPage(transactionPage + 1);
-  }, [transactions, transactionPage, transactionPageSize]);
+  }, [transactionPage, transactionPageSize]);
 
   return {
     loading,
@@ -152,6 +165,7 @@ const useTransactions = () => {
     setTransactionError,
     transactionErrorOpened,
     setTransactionErrorOpened,
+    transactionAmount,
     transactionPage,
     transactionTotalPages,
     goToTransactionPage,
@@ -167,11 +181,12 @@ const useTransactions = () => {
     handleTransactionSort,
     transactionSortKey,
     transactionDateStart,
-    setTransactionDateStart,
+    handleTransactionDateStart,
     transactionDateEnd,
-    setTransactionDateEnd,
+    handleTransactionDateEnd,
     getAllTransactions,
     transactions: transactionsFiltered,
+    transactionsPaginated: transactionsPaginated,
   }
 };
 

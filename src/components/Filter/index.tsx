@@ -8,9 +8,9 @@ interface IFilterProps {
   handleTransactionSort: (event: ChangeEvent<HTMLSelectElement>) => void;
   setForcedApiError: Function;
   transactionDateStart: Date;
-  setTransactionDateStart: Function;
+  handleTransactionDateStart: Function;
   transactionDateEnd?: Date;
-  setTransactionDateEnd?: Function;
+  handleTransactionDateEnd?: Function;
   transactionPageSize: number;
   handleTransactionPageSize: (event: ChangeEvent<HTMLSelectElement>) => void;
 }
@@ -21,41 +21,54 @@ export const Filter = ({
   handleTransactionSort,
   setForcedApiError,
   transactionDateStart,
-  setTransactionDateStart,
+  handleTransactionDateStart,
   transactionDateEnd,
-  setTransactionDateEnd,
+  handleTransactionDateEnd,
   transactionPageSize,
   handleTransactionPageSize
 }: IFilterProps) => {
   return (
-    <div className="w-[100%] mb-4 flex flex-row space-between">
-      <button
-        className={`${forcedApiError ? 'bg-[red]' : 'bg-[blue]'} text-white py-2 px-4 rounded`}
-        onClick={() => setForcedApiError(!forcedApiError)}
-      >
-        Force API Error
-      </button>
+    <div className="w-[100%] flex flex-col lg:flex-row space-between gap-4">
+      <div className="flex flex-col">
+        <label>Force error</label>
+        <button
+          className={`${forcedApiError ? 'bg-[red]' : 'bg-[blue]'} h-[40px] text-white py-2 px-4 rounded`}
+          onClick={() => setForcedApiError(!forcedApiError)}
+        >
+          Force API Error
+        </button>
+      </div>
 
-      <select value={transactionSortKey} onChange={handleTransactionSort}>
-        <option value="date-asc">Date newest</option>
-        <option value="date-desc">Date oldest</option>
-        <option value="amount-asc">Amount greater</option>
-        <option value="amount-desc">Amount lower</option>
-      </select>
+      <div className="flex flex-col">
+        <label>Sorting</label>
+        <select className="w-[150px] h-[40px] text-[#333]" value={transactionSortKey} onChange={handleTransactionSort}>
+          <option>Select sorting</option>
+          <option value="date-asc">Date newest</option>
+          <option value="date-desc">Date oldest</option>
+          <option value="amount-asc">Amount greater</option>
+          <option value="amount-desc">Amount lower</option>
+        </select>
+      </div>
 
-      <select value={transactionPageSize} onChange={handleTransactionPageSize}>
-        <option value="2">2</option>
-        <option value="5">5</option>
-        <option value="10">10</option>
-        <option value="15">15</option>
-        <option value="20">20</option>
-      </select>
+      <div className="flex flex-col">
+        <label>Page size</label>
+        <select className="w-[100px] h-[40px] text-[#333]" value={transactionPageSize} onChange={handleTransactionPageSize}>
+          <option value="2">2</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="75">75</option>
+          <option value="100">100</option>
+        </select>
+      </div>
 
       <Datepicker
         startDate={transactionDateStart}
         endDate={transactionDateEnd}
-        onChangeStartDate={setTransactionDateStart}
-        onChangeEndDate={setTransactionDateEnd}
+        onChangeStartDate={handleTransactionDateStart}
+        onChangeEndDate={handleTransactionDateEnd}
         multiple
       />
     </div>

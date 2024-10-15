@@ -40,8 +40,6 @@ export const Pagination = ({
 }: IPaginationProps) => {
   const pages = transactionTotalPages ? new Array(transactionTotalPages).fill('') : [];
 
-  console.log('total pages', transactionTotalPages, pages)
-
   return pages.length > 1 ? (
     <div className="flex flex-row justify-start gap-4">
       <PaginationItem

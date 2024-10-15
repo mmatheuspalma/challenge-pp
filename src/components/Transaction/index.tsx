@@ -1,5 +1,7 @@
 import { ITransaction } from "@/app/api/transactions/route";
 
+import { currencyFormater } from "@/utils/formater";
+
 interface ITransactionProps extends ITransaction {}
 
 export const Transaction = ({ id, description, amount, date }: ITransactionProps) => {
@@ -12,7 +14,7 @@ export const Transaction = ({ id, description, amount, date }: ITransactionProps
         {description}
       </div>
       <div>
-        USD {amount}
+        {currencyFormater.format(amount)}
       </div>
       <div>
         Created at <strong>{new Date(date).toDateString()}</strong>

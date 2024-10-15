@@ -1,6 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+React.js Challenge
 
-## Getting Started
+## This project attend all the requirements bellow
+### Main Requirements:
+[x] Create a React.js application that displays a list of payment transactions.
+[x] Implement a mock API to simulate fetching payment transaction data. You can use a JavaScript array to store mock data.
+[x] Display the following information for each payment transaction: Transaction ID, Date, Description, Amount (in USD)
+[x] Implement error handling for API requests. If the API request fails, display an error message to the user.
+[x] Design the user interface to be clean and responsive using CSS and HTML. You can use any CSS framework or libraries of your choice.
+[x] Use TypeScript for type-checking and ensure type safety throughout your code.
+[x] Add a date range filter to allow users to filter transactions by a specified date range.
+
+### Bonus Points (Optional):
+[x] Implement pagination to show a limited number of transactions per page.
+[x] Add sorting functionality to allow users to sort transactions by date or amount.
+[x] Create a summary section that displays the total number of transactions and the total transaction amount within the selected date range.
+
+### Suggested (Added by me)
+[x] Component Unit tests
+[x] Function Unit tests
+
+## Stack
+- Typescript
+- Next.js (App router)
+- React.js
+- Jest
+
+## Running the project
 
 First, run the development server:
 
@@ -15,22 +40,3 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

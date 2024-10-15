@@ -30,8 +30,9 @@ export const Filter = ({
   return (
     <div className="w-[100%] flex flex-col lg:flex-row space-between gap-4">
       <div className="flex flex-col">
-        <label>Force error</label>
+        <label htmlFor="force-error">Force error</label>
         <button
+          id="force-error"
           className={`${forcedApiError ? 'bg-[red]' : 'bg-[blue]'} h-[40px] text-white py-2 px-4 rounded`}
           onClick={() => setForcedApiError(!forcedApiError)}
         >
@@ -40,8 +41,14 @@ export const Filter = ({
       </div>
 
       <div className="flex flex-col">
-        <label>Sorting</label>
-        <select className="w-[150px] h-[40px] text-[#333]" value={transactionSortKey} onChange={handleTransactionSort}>
+        <label htmlFor="sorting">Sorting</label>
+        <select
+          id="sorting"
+          name="sorting"
+          className="w-[150px] h-[40px] text-[#333]"
+          value={transactionSortKey}
+          onChange={handleTransactionSort}
+        >
           <option>Select sorting</option>
           <option value="date-asc">Date newest</option>
           <option value="date-desc">Date oldest</option>
@@ -51,8 +58,14 @@ export const Filter = ({
       </div>
 
       <div className="flex flex-col">
-        <label>Page size</label>
-        <select className="w-[100px] h-[40px] text-[#333]" value={transactionPageSize} onChange={handleTransactionPageSize}>
+        <label htmlFor="page-size">Page size</label>
+        <select
+          id="page-size"
+          name="page-size"
+          className="w-[100px] h-[40px] text-[#333]"
+          value={transactionPageSize}
+          onChange={handleTransactionPageSize}
+        >
           <option value="2">2</option>
           <option value="5">5</option>
           <option value="10">10</option>

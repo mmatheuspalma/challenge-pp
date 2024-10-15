@@ -9,6 +9,7 @@ interface IModalProps {
 
 export const Modal = ({ title, description, isOpen, close }: IModalProps) => {
   const handleClose = (e: MouseEvent) => {
+    e.stopPropagation();
     e.preventDefault();
 
     close();

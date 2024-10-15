@@ -1,4 +1,4 @@
-import { currencyFormater } from "@/utils/formater";
+import { currencyFormatter } from "@/utils/formatter";
 
 interface ISummaryProps {
   transactionCount: number;
@@ -20,7 +20,7 @@ export const Summary = ({
       <div className="flex flex-col w-[100%] md:w-[25%] bg-[white] rounded p-2">
         <span className="text-[16px]">Total amount</span>
         <span className="text-[28px] text-[#333]">
-          <strong>{currencyFormater.format(transactionAmount)}</strong>
+          <strong>{currencyFormatter.format(transactionAmount)}</strong>
         </span>
       </div>
     </div>

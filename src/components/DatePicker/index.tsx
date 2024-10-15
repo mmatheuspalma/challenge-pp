@@ -13,8 +13,9 @@ const Datepicker = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, mu
   return (
     <div className="flex flex-row gap-4 h-auto">
       <div className="flex h-[40px] flex-col">
-        <label>Date from</label>
+        <label htmlFor="datePickerFrom">Date from</label>
         <DatePicker
+          id="datePickerFrom"
           className="text-[#333]"
           selected={startDate}
           onChange={(date) => onChangeStartDate(date)}
@@ -26,8 +27,9 @@ const Datepicker = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, mu
       {
         multiple ? (
           <div className="flex flex-col">
-            <label>Date to</label>
+            <label htmlFor="datePickerTo">Date to</label>
             <DatePicker
+              id="datePickerTo"
               className="text-[#333]"
               selected={endDate}
               onChange={(date) => onChangeEndDate && onChangeEndDate(date)}
